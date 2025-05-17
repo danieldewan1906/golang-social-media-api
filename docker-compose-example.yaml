@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  {your-container}:
+    container_name: {your-container-name}
+    build:
+      context: "./"
+      dockerfile: Dockerfile
+    image: {your-image}
+    restart: on-failure
+    ports:
+      - "{PORT}:{PORT}"
+    environment:
+      SERVER_HOST: {SERVER_HOST}
+      SERVER_PORT: {SERVER_PORT}
+      DB_HOST: {DB_HOST}
+      DB_PORT: {DB_PORT}
+      DB_NAME: {DB_NAME}
+      DB_SCHEMA: {DB_SCHEMA}
+      DB_USER: {DB_USER}
+      DB_PASS: {DB_PASS}
+      DB_TZ: {DB_TZ}
+      JWT_KEY: {JWT_KEY}
+      JWT_EXP: {JWT_EXP}
+      FILE_PATH: {FILE_PATH}
+    networks:
+      - {your-network}
+
+networks:
+  {your-network}:
+    name: {your-network-name}
+    

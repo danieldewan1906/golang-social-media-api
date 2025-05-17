@@ -1,0 +1,30 @@
+FROM {image-golang} AS builder
+WORKDIR /app
+
+COPY go.mod go.sum ./
+RUN go mod download
+
+COPY . .
+
+RUN go build -o {build-name} .
+
+FROM {image-alpine}
+ENV SERVER_HOST=
+ENV SERVER_PORT=
+ENV DB_HOST=
+ENV DB_PORT=
+ENV DB_NAME=
+ENV DB_SCHEMA=
+ENV DB_USER=
+ENV DB_PASS=
+ENV DB_TZ=
+ENV JWT_KEY=
+ENV JWT_EXP=
+ENV FILE_PATH=
+
+WORKDIR /app
+
+COPY --from=builder /app ./
+
+EXPOSE ${SERVER_PORT}
+CMD [ "./{build-name}" ]
