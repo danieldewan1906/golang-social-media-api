@@ -5,6 +5,7 @@ type Config struct {
 	Database   Database
 	Jwt        Jwt
 	FileUpload FileUpload
+	Redis      Redis
 }
 
 type Server struct {
@@ -29,4 +30,9 @@ type Database struct {
 
 type FileUpload struct {
 	Path string
+}
+
+type Redis struct {
+	Address  string
+	Password string
 }

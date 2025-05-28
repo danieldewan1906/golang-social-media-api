@@ -15,7 +15,9 @@ This repository contains the documentation Mini Social Media API.
     >> DB_TZ= <br>
     >> JWT_KEY= <br>
     >> JWT_EXP= <br>
-    >> FILE_PATH= <br></sup>
+    >> FILE_PATH= <br>
+    >> REDIS_ADDR= <br>
+    >> REDIS_PASS= <br></sup>
 3. download dependencies
     > `go mod download`
 4. run project

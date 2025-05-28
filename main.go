@@ -15,6 +15,7 @@ import (
 func main() {
 	cnf := config.Get()
 	dbConnection := connection.GetDatabase(cnf.Database)
+	redisConnection := connection.GetRedisConnection(cnf.Redis)
 
 	app := fiber.New()
 
@@ -29,12 +30,13 @@ func main() {
 	likeRepository := repository.NewLikeRepository(dbConnection)
 	commentRepository := repository.NewCommentRepository(dbConnection)
 	followRepository := repository.NewFollowRepository(dbConnection)
+	redisRepository := repository.NewRedisRepository(redisConnection)
 
 	// service
 	authService := service.NewAuth(dbConnection, cnf, userRepository, userDetailRepository)
 	userImageService := service.NewUserImageService(dbConnection, userImageRepository)
 	postService := service.NewPostService(dbConnection, postRepository, likeRepository, commentRepository)
-	userDetailService := service.NewUserDetail(dbConnection, userDetailRepository, userImageService, followRepository, postService)
+	userDetailService := service.NewUserDetail(dbConnection, userDetailRepository, userImageService, followRepository, postService, redisRepository)
 	likeService := service.NewLikeService(dbConnection, likeRepository, postService)
 	commentService := service.NewCommentService(dbConnection, commentRepository, postService)
 	followService := service.NewFollowService(dbConnection, followRepository, userDetailService)

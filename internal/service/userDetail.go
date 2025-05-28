@@ -3,10 +3,12 @@ package service
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 	"errors"
 	"golang-restful-api/domains"
 	"golang-restful-api/dto"
 	"golang-restful-api/internal/util"
+	"log"
 	"time"
 )
 
@@ -16,34 +18,53 @@ type userDetailService struct {
 	userImageService     domains.UserImagesService
 	followRepository     domains.FollowRepository
 	postService          domains.PostService
+	redisRepository      domains.RedisRepository
 }
 
-func NewUserDetail(DB *sql.DB, userDetailRepository domains.UserDetailRepository, userImageService domains.UserImagesService, followRepository domains.FollowRepository, postService domains.PostService) domains.UserDetailService {
+func NewUserDetail(DB *sql.DB, userDetailRepository domains.UserDetailRepository, userImageService domains.UserImagesService, followRepository domains.FollowRepository, postService domains.PostService, redisRepository domains.RedisRepository) domains.UserDetailService {
 	return &userDetailService{
 		DB:                   DB,
 		userDetailRepository: userDetailRepository,
 		userImageService:     userImageService,
 		followRepository:     followRepository,
 		postService:          postService,
+		redisRepository:      redisRepository,
 	}
 }
 
 // Index implements domain.CustomerService.
 func (service *userDetailService) FindAll(ctx context.Context, req dto.UserDetailRequestDto) ([]dto.UserDetailDto, error) {
+	cache, _ := service.redisRepository.Get("USERS:ALL")
+	var userDetailDto []dto.UserDetailDto
+
+	if cache != "" {
+		log.Println("DATA CACHE USERS DITEMUKKAN")
+		err := json.Unmarshal([]byte(cache), &userDetailDto)
+		if err != nil {
+			util.PanicIfError(err)
+		}
+
+		return userDetailDto, nil
+	}
+
 	users, err := service.userDetailRepository.FindAll(ctx, req)
 	if err != nil {
 		return nil, err
 	}
 
-	var userDetailDto []dto.UserDetailDto
 	for _, v := range users {
 		userDetailDto = append(userDetailDto, dto.UserDetailDto{
-			ID:        v.UserId,
+			ID:        int(v.ID),
 			FirstName: v.FirstName,
 			LastName:  v.LastName.String,
 			Address:   v.Address.String,
 			CreatedAt: v.CreatedAt.Time.String(),
 		})
+	}
+
+	err = service.redisRepository.Set("USERS:ALL", userDetailDto)
+	if err != nil {
+		util.PanicIfError(err)
 	}
 
 	return userDetailDto, nil

@@ -36,5 +36,9 @@ func Get() *Config {
 		FileUpload: FileUpload{
 			Path: os.Getenv("FILE_PATH"),
 		},
+		Redis: Redis{
+			Address:  os.Getenv("REDIS_ADDR"),
+			Password: os.Getenv("REDIS_PASS"),
+		},
 	}
 }
